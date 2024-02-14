@@ -7,6 +7,9 @@ import {
   Route,
   Link,
 } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { logoutSuccess } from "../../authActions";
+
 
 import swal from "sweetalert";
 import routes from "../../routes/routes";
@@ -18,6 +21,8 @@ import mobileLogo from "../../assets/img/klout_mobile_logo.jpg";
 
 function Sidebar({ menuOpen, setMenuOpen, toggleMenu }) {
   const history = useHistory();
+
+  const dispatch = useDispatch();
 
   //for mobile view
   const windowWidth = window.innerWidth;
@@ -40,8 +45,7 @@ function Sidebar({ menuOpen, setMenuOpen, toggleMenu }) {
       if (result.isConfirmed) {
         axios.post(`/api/logout`).then(function (res) {
           if (res.data.status === 200) {
-            localStorage.removeItem("auth_token");
-            localStorage.removeItem("auth_name");
+            dispatch(logoutSuccess());
 
             Swal.fire({
               icon: "success",

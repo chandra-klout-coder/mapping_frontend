@@ -1,19 +1,36 @@
-import React, { useState } from "react";
-
+import React, { useState, useEffect } from "react";
 import { Link, useHistory } from "react-router-dom";
 
-import axios from "axios";
-
-import swal from "sweetalert";
-
 import "./Login.css";
-
+import axios from "axios";
+import swal from "sweetalert";
 import loadingGif from "../assets/images/load.gif";
-
 import backgroundImage from "../assets/images/2.jpg";
+import { useDispatch } from 'react-redux';
+import { loginSuccess } from "../authActions";
 
 function Login() {
+ 
   const history = useHistory();
+
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    
+    console.log('Before removal:', localStorage.getItem('auth_token'));
+    console.log('Before removal:', localStorage.getItem('auth_name'));
+
+    // Remove auth_token and auth_name from localStorage
+    localStorage.removeItem('auth_token');
+    localStorage.removeItem('auth_name');
+
+    console.log('After removal:', localStorage.getItem('auth_token'));
+    console.log('After removal:', localStorage.getItem('auth_name'));
+
+
+    // Redirect to the login page
+    history.push("/login");
+  }, [history]);
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -30,10 +47,8 @@ function Login() {
     const { name, value } = e.target;
     const validationErrors = { ...errors };
 
-    // Validation logic for each input field
     switch (name) {
       case "email":
-        // Validate email (you can use regex or other validation libraries)
         if (!value) {
           validationErrors.email = "Email is required";
         } else if (!/\S+@\S+\.\S+/.test(value)) {
@@ -43,7 +58,6 @@ function Login() {
         }
         break;
       case "password":
-        // Validate password (you can add more complex rules if needed)
         if (!value) {
           validationErrors.password = "Password is required";
         } else if (value.length < 8) {
@@ -59,31 +73,6 @@ function Login() {
 
     setErrors(validationErrors);
   };
-
-  // const validateForm = () => {
-  //   let formIsValid = true;
-
-  //   const newErrors = {};
-
-  //   // Email validation
-  //   if (!email) {
-  //     formIsValid = false;
-  //     newErrors.email = "Email is required";
-  //   } else if (!/\S+@\S+\.\S+/.test(email)) {
-  //     formIsValid = false;
-  //     newErrors.email = "Email is invalid";
-  //   }
-
-  //   // Password validation
-  //   if (!password) {
-  //     formIsValid = false;
-  //     newErrors.password = "Password is required";
-  //   }
-
-  //   setErrors(newErrors);
-
-  //   return formIsValid;
-  // };
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -130,11 +119,13 @@ function Login() {
           password,
         })
         .then((res) => {
-          console.log('data', res);
+          console.log("data", res);
           if (res.data.status === 200) {
-          
-            localStorage.setItem("auth_token", res.data.access_token);
-            localStorage.setItem("auth_name", "user");
+
+            dispatch(loginSuccess(res.data.access_token));
+
+            // localStorage.setItem("auth_token", res.data.access_token);
+            // localStorage.setItem("auth_name", "user");
 
             setErrors({});
 
@@ -336,17 +327,11 @@ function Login() {
                         </Link>
                       </div>
 
-                      {/* <div className="text-center">
+                      <div className="text-center">
                         <Link to="/register" className="medium">
                           Create an Account!
                         </Link>
-                      </div> */}
-
-                      {/* <div className="text-center">
-                        <Link to="/reset-password" className="medium">
-                          Reset Password
-                        </Link>
-                      </div> */}
+                      </div>
                     </div>
                   </div>
                 </div>
