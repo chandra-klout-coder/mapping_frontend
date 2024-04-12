@@ -16,17 +16,11 @@ function Login() {
   const dispatch = useDispatch();
 
   useEffect(() => {
-    
-    console.log('Before removal:', localStorage.getItem('auth_token'));
-    console.log('Before removal:', localStorage.getItem('auth_name'));
+ 
 
     // Remove auth_token and auth_name from localStorage
     localStorage.removeItem('auth_token');
     localStorage.removeItem('auth_name');
-
-    console.log('After removal:', localStorage.getItem('auth_token'));
-    console.log('After removal:', localStorage.getItem('auth_name'));
-
 
     // Redirect to the login page
     history.push("/login");
@@ -119,13 +113,11 @@ function Login() {
           password,
         })
         .then((res) => {
-          console.log("data", res);
+
+        
           if (res.data.status === 200) {
 
             dispatch(loginSuccess(res.data.access_token));
-
-            // localStorage.setItem("auth_token", res.data.access_token);
-            // localStorage.setItem("auth_name", "user");
 
             setErrors({});
 

@@ -24,7 +24,7 @@ function ChangePassword(props) {
   });
 
   useEffect(() => {
-    axios.get(`/api/profile`).then((res) => {
+    axios.post(`/api/profile`).then((res) => {
       if (res.data.status === 200) {
         setFormInput(res.data.user);
       } else if (res.data.status === 400) {
@@ -116,7 +116,7 @@ function ChangePassword(props) {
       /^\s*$/.test(formInput.confirm_password)
     ) {
       fieldErrors.confirm_password = "Confirm Password is required.";
-    }  else if (formInput.password !== formInput.confirm_password) {
+    } else if (formInput.password !== formInput.confirm_password) {
       fieldErrors.confirm_password = "Password mismatch with New password.";
     }
 
@@ -128,8 +128,6 @@ function ChangePassword(props) {
           headers: { "Content-Type": "multipart/form-data" },
         })
         .then((res) => {
-
-          console.log('data', res);
           if (res.data.status === 200) {
             localStorage.removeItem("auth_token");
             localStorage.removeItem("auth_name");
@@ -190,7 +188,8 @@ function ChangePassword(props) {
                 borderRadius: "12px",
               }}
             >
-              <i className="fa fa-solid fa-arrow-left"></i> &nbsp; Go To Dashboard
+              <i className="fa fa-solid fa-arrow-left"></i> &nbsp; Go To
+              Dashboard
             </Link>
           </div>
         </div>
@@ -220,7 +219,10 @@ function ChangePassword(props) {
                     >
                       Old Password
                     </label>
-                    <div className="col-5 col-lg-5 input-group" style={{ width: "100%" }}>
+                    <div
+                      className="col-5 col-lg-5 input-group"
+                      style={{ width: "100%" }}
+                    >
                       <input
                         type={showPassword ? "text" : "password"}
                         className={`form-control ${
@@ -262,10 +264,16 @@ function ChangePassword(props) {
 
                   {/* New Password */}
                   <div className="form-group row">
-                    <label forhtml="password" className="col-12 col-lg-3 col-form-label">
+                    <label
+                      forhtml="password"
+                      className="col-12 col-lg-3 col-form-label"
+                    >
                       New Password
                     </label>
-                    <div className="col-5 input-group" style={{ width: "100%" }}>
+                    <div
+                      className="col-5 input-group"
+                      style={{ width: "100%" }}
+                    >
                       <input
                         type={showNewPassword ? "text" : "password"}
                         className={`form-control ${
@@ -315,7 +323,10 @@ function ChangePassword(props) {
                     >
                       Confirm Password
                     </label>
-                    <div className="col-5 input-group" style={{ width: "100%" }}>
+                    <div
+                      className="col-5 input-group"
+                      style={{ width: "100%" }}
+                    >
                       <input
                         type={showConfirmPassword ? "text" : "password"}
                         className={`form-control ${

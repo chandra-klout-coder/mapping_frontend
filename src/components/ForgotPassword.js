@@ -49,7 +49,7 @@ function ForgotPassword() {
         const res = await axios.post("/api/forgot-password", { email });
         // setSuccessMessage(response.data.message);
 
-        if (res.data.status === 200) {
+        if (res.data.status == "200") {
 
           setEmailError("");
           setErrorMessage("");

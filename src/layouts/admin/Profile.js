@@ -6,6 +6,7 @@ import loadingGif from "../../assets/images/load.gif";
 import Defaultuser from "../../assets/images/defaultuser.png";
 
 function EditAttendee(props) {
+
   const history = useHistory();
 
   const imageBaseUrl = process.env.REACT_APP_API_URL;
@@ -35,7 +36,8 @@ function EditAttendee(props) {
   });
 
   useEffect(() => {
-    axios.get(`/api/profile`).then((res) => {
+    axios.post(`/api/profile`).then((res) => {
+
       if (res.data.status === 200) {
         setFormInput(res.data.user);
 

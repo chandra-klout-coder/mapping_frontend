@@ -25,7 +25,7 @@ import Dashboard from "./layouts/admin/Dashboard";
 import { Provider } from "react-redux";
 import store from "./store";
 
-axios.defaults.baseURL = "http://ec2-52-66-209-227.ap-south-1.compute.amazonaws.com/";
+axios.defaults.baseURL = "https://api.klout.club/mapping/";
 // axios.defaults.baseURL = "http://localhost:8000/";
 
 axios.defaults.headers.post["Content-Type"] = "application/json";
@@ -43,6 +43,7 @@ axios.interceptors.request.use(function (config) {
 });
 
 function App() {
+  
   const isAuthenticated = useSelector((state) => state.auth.isAuthenticated);
 
   return (

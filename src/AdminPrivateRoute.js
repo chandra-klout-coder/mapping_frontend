@@ -13,9 +13,11 @@ function AdminPrivateRoute({ ...rest }) {
 
   useEffect(() => {
     const checkAuthenticated = async () => {
+      
       try {
-        const response = await axios.get(`/api/checkingAuthenticated`);
-        if (response.status === 200) {
+        const response = await axios.post(`/api/checkingAuthenticated`);
+        
+        if (response.status == "200") {
           setAuthenticated(true);
         }
       } catch (error) {

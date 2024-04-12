@@ -6,7 +6,6 @@ import { useHistory, Link } from "react-router-dom";
 import loadingGif from "../../assets/images/load.gif";
 
 function MapIndustry(props) {
-
   const history = useHistory();
 
   const data_module_type = "industry";
@@ -60,6 +59,8 @@ function MapIndustry(props) {
 
     setSelectedIndustries(selectedIds);
   };
+
+
 
   const handleAssignData = (e) => {
     e.preventDefault();
@@ -117,12 +118,12 @@ function MapIndustry(props) {
       case "industry":
         if (value === "") {
           fieldErrors[name] = "Industry is required.";
-        } 
+        }
         break;
       default:
         break;
     }
-    
+
     setErrors((prevErrors) => ({
       ...prevErrors,
       ...fieldErrors,
@@ -146,6 +147,46 @@ function MapIndustry(props) {
     }
   };
 
+  //remove data
+  const removeIndustryData = (e) => {
+    e.preventDefault();
+
+    const fieldErrors = {};
+
+    if (selectedIndustries.length === 0) {
+      fieldErrors.industry_remove_data = "Select Industry";
+    }
+
+    if (Object.keys(fieldErrors).length === 0) {
+      const payload = {
+        remove_data_id: selectedIndustries,
+      };
+
+      axios
+        .post(`/api/removeSelectedIndustriesData`, payload, {
+          headers: { "Content-Type": "multipart/form-data" },
+        })
+        .then((res) => {
+          if (res.data.status === 200) {
+
+            setUnassignedData((prevUnassigned) =>
+              prevUnassigned.filter(
+                (item) => !selectedIndustries.includes(item.id)
+              )
+            );
+
+            swal("Success", res.data.message, "danger");
+
+            setErrors({});
+          } else if (res.data.status === 400) {
+            swal("Please Assign Data Correctly.", "", "error");
+          }
+        });
+    } else {
+      setErrors(fieldErrors);
+    }
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
 
@@ -153,9 +194,9 @@ function MapIndustry(props) {
 
     const fieldErrors = {};
 
-    if (formInput.industry === "") {
-      fieldErrors.industry = "Industry is required.";
-    }
+    // if (formInput.industry === "") {
+    //   fieldErrors.industry = "Industry is required.";
+    // }
 
     if (unSelectedIndustries.length === 0) {
       fieldErrors.industry_data = "Assign Industry is Empty or Not Selected.";
@@ -166,20 +207,28 @@ function MapIndustry(props) {
 
       let valuesArray = unSelectedIndustries.map(assignDataListArray);
 
-      const payload = {
-        assign_data_id: unSelectedIndustries,
-        assign_data: valuesArray,
-        industry_id: formInput.industry,
-      };
+      //Check Industry data
+      let payload;
+
+      if (formInput.industry !== "") {
+        payload = {
+          assign_data_id: unSelectedIndustries,
+          assign_data: valuesArray,
+          industry_id: formInput.industry,
+        };
+      } else {
+        payload = {
+          assign_data_id: unSelectedIndustries,
+          assign_data: valuesArray,
+        };
+      }
 
       axios
         .post(`/api/assignedIndustriesData`, payload, {
           headers: { "Content-Type": "multipart/form-data" },
         })
         .then((res) => {
-
           if (res.data.status === 200) {
-            
             setAssignDataList((prevUnassigned) =>
               prevUnassigned.filter(
                 (item) => !unSelectedIndustries.includes(item.id)
@@ -192,15 +241,12 @@ function MapIndustry(props) {
               industry: "",
               industry_data: [],
             });
-            
+
             setErrors({});
 
             // history.push(`/admin/all-industries`);
-
           } else if (res.data.status === 400) {
-
             swal("Please Assign Data Correctly.", "", "error");
-
           }
         });
     } else {
@@ -256,7 +302,6 @@ function MapIndustry(props) {
                   <div className="form-group row">
                     <div className="col-md-3">
                       <h6>Un-Assigned Industry</h6>
-
                       <select
                         multiple
                         value={selectedIndustries}
@@ -269,6 +314,22 @@ function MapIndustry(props) {
                           </option>
                         ))}
                       </select>
+
+                      {/* Remove Button */}
+                      {selectedIndustries && selectedIndustries.length > 0 && (
+                        <button
+                          className="btn btn-sm btn-danger mt-4 btn-user"
+                          style={{
+                            fontSize: "14px",
+                            padding: "1% 6%",
+                            float: "left",
+                          }}
+                          onClick={removeIndustryData}
+                        >
+                          <i className="fa fa-solid fa-trash"></i> &nbsp; Remove
+                        </button>
+                      )}
+
                     </div>
 
                     <div className="col-md-3 text-center">
@@ -319,6 +380,21 @@ function MapIndustry(props) {
                             {errors.industry_data}
                           </div>
                         )}
+
+                        {/* {unSelectedIndustries &&
+                          unSelectedIndustries.length > 0 && (
+                            <button
+                              className="btn btn-sm btn-primary mt-4 btn-user"
+                              style={{
+                                fontSize: "14px",
+                                padding: "1% 6%",
+                                float: "left",
+                              }}
+                              onClick={saveIndustryData}
+                            >
+                              <i className="fa fa-solid "></i> &nbsp; Save
+                            </button>
+                          )} */}
                       </div>
                     </div>
 

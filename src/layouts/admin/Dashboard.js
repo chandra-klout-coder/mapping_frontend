@@ -7,6 +7,7 @@ import "slick-carousel/slick/slick-theme.css";
 import "./EventCard.css";
 
 function Dashboard() {
+  
   const imageBaseUrl = process.env.REACT_APP_API_URL;
 
   const [totalCity, setTotalCity] = useState(0);

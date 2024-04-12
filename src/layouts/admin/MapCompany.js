@@ -6,7 +6,6 @@ import { useHistory, Link } from "react-router-dom";
 import loadingGif from "../../assets/images/load.gif";
 
 function MapCompany(props) {
-
   const history = useHistory();
 
   const data_module_type = "company";
@@ -90,9 +89,7 @@ function MapCompany(props) {
 
     setUnassignedData((prevAssign) => [
       ...prevAssign,
-      ...assignDataList.filter((item) =>
-        unSelectedCompanies.includes(item.id)
-      ),
+      ...assignDataList.filter((item) => unSelectedCompanies.includes(item.id)),
     ]);
 
     setAssignDataList((prevUnassigned) =>
@@ -117,12 +114,12 @@ function MapCompany(props) {
       case "company":
         if (value === "") {
           fieldErrors[name] = "Company is required.";
-        } 
+        }
         break;
       default:
         break;
     }
-    
+
     setErrors((prevErrors) => ({
       ...prevErrors,
       ...fieldErrors,
@@ -137,12 +134,52 @@ function MapCompany(props) {
   };
 
   const assignDataListArray = (id) => {
+    
     const matchedItem = assignDataList.find((item) => item.id === id);
 
     if (matchedItem) {
       return matchedItem.value;
     } else {
       return "Not found";
+    }
+  };
+
+  //remove data Company
+  const removeCompanyData = (e) => {
+    e.preventDefault();
+
+    const fieldErrors = {};
+
+    if (selectedCompanies.length === 0) {
+      fieldErrors.company_remove_data = "Select Company";
+    }
+
+    if (Object.keys(fieldErrors).length === 0) {
+      const payload = {
+        remove_data_id: selectedCompanies,
+      };
+
+      axios
+        .post(`/api/removeSelectedCompaniesData`, payload, {
+          headers: { "Content-Type": "multipart/form-data" },
+        })
+        .then((res) => {
+          if (res.data.status === 200) {
+            setUnassignedData((prevUnassigned) =>
+              prevUnassigned.filter(
+                (item) => !selectedCompanies.includes(item.id)
+              )
+            );
+
+            swal("Success", res.data.message, "danger");
+
+            setErrors({});
+          } else if (res.data.status === 400) {
+            swal("Please Assign Data Correctly.", "", "error");
+          }
+        });
+    } else {
+      setErrors(fieldErrors);
     }
   };
 
@@ -153,9 +190,9 @@ function MapCompany(props) {
 
     const fieldErrors = {};
 
-    if (formInput.company === "") {
-      fieldErrors.company = "Company is required.";
-    }
+    // if (formInput.company === "") {
+    //   fieldErrors.company = "Company is required.";
+    // }
 
     if (unSelectedCompanies.length === 0) {
       fieldErrors.company_data = "Assign Company is Empty or Not Selected.";
@@ -166,20 +203,34 @@ function MapCompany(props) {
 
       let valuesArray = unSelectedCompanies.map(assignDataListArray);
 
-      const payload = {
-        assign_data_id: unSelectedCompanies,
-        assign_data: valuesArray,
-        company_id: formInput.company,
-      };
+      //Check Industry data
+      let payload;
+
+      if (formInput.industry !== "") {
+        payload = {
+          assign_data_id: unSelectedCompanies,
+          assign_data: valuesArray,
+          company_id: formInput.company,
+        };
+      } else {
+        payload = {
+          assign_data_id: unSelectedCompanies,
+          assign_data: valuesArray,
+        };
+      }
+
+      // const payload = {
+      //   assign_data_id: unSelectedCompanies,
+      //   assign_data: valuesArray,
+      //   company_id: formInput.company,
+      // };
 
       axios
         .post(`/api/assignedCompaniesData`, payload, {
           headers: { "Content-Type": "multipart/form-data" },
         })
         .then((res) => {
-
           if (res.data.status === 200) {
-            
             setAssignDataList((prevUnassigned) =>
               prevUnassigned.filter(
                 (item) => !unSelectedCompanies.includes(item.id)
@@ -192,15 +243,12 @@ function MapCompany(props) {
               company: "",
               company_data: [],
             });
-            
+
             setErrors({});
 
             // history.push(`/admin/all-industries`);
-
           } else if (res.data.status === 400) {
-
             swal("Please Assign Data Correctly.", "", "error");
-
           }
         });
     } else {
@@ -269,6 +317,21 @@ function MapCompany(props) {
                           </option>
                         ))}
                       </select>
+
+                      {/* Remove Button */}
+                      {selectedCompanies && selectedCompanies.length > 0 && (
+                        <button
+                          className="btn btn-sm btn-danger mt-4 btn-user"
+                          style={{
+                            fontSize: "14px",
+                            padding: "1% 6%",
+                            float: "left",
+                          }}
+                          onClick={removeCompanyData}
+                        >
+                          <i className="fa fa-solid fa-trash"></i> &nbsp; Remove
+                        </button>
+                      )}
                     </div>
 
                     <div className="col-md-3 text-center">

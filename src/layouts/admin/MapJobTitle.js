@@ -143,6 +143,45 @@ function MapJobTitle(props) {
     }
   };
 
+  //remove data JobTitle
+  const removeJobTitleData = (e) => {
+    e.preventDefault();
+
+    const fieldErrors = {};
+
+    if (selectedJobTitles.length === 0) {
+      fieldErrors.job_title_remove_data = "Select JobTitle";
+    }
+
+    if (Object.keys(fieldErrors).length === 0) {
+      const payload = {
+        remove_data_id: selectedJobTitles,
+      };
+
+      axios
+        .post(`/api/removeSelectedJobTitlesData`, payload, {
+          headers: { "Content-Type": "multipart/form-data" },
+        })
+        .then((res) => {
+          if (res.data.status === 200) {
+            setUnassignedData((prevUnassigned) =>
+              prevUnassigned.filter(
+                (item) => !selectedJobTitles.includes(item.id)
+              )
+            );
+
+            swal("Success", res.data.message, "danger");
+
+            setErrors({});
+          } else if (res.data.status === 400) {
+            swal("Please Assign Data Correctly.", "", "error");
+          }
+        });
+    } else {
+      setErrors(fieldErrors);
+    }
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
 
@@ -150,9 +189,9 @@ function MapJobTitle(props) {
 
     const fieldErrors = {};
 
-    if (formInput.job_title === "") {
-      fieldErrors.job_title = "Job-Title is required.";
-    }
+    // if (formInput.job_title === "") {
+    //   fieldErrors.job_title = "Job-Title is required.";
+    // }
 
     if (unSelectedJobTitles.length === 0) {
       fieldErrors.job_title_data = "Assign Job-Title is Empty or Not Selected.";
@@ -163,11 +202,21 @@ function MapJobTitle(props) {
 
       let valuesArray = unSelectedJobTitles.map(assignDataListArray);
 
-      const payload = {
-        assign_data_id: unSelectedJobTitles,
-        assign_data: valuesArray,
-        job_title_id: formInput.job_title,
-      };
+      //Check Industry data
+      let payload;
+
+      if (formInput.job_title !== "") {
+        payload = {
+          assign_data_id: unSelectedJobTitles,
+          assign_data: valuesArray,
+          company_id: formInput.company,
+        };
+      } else {
+        payload = {
+          assign_data_id: unSelectedJobTitles,
+          assign_data: valuesArray,
+        };
+      }
 
       axios
         .post(`/api/assignedJobTitlesData`, payload, {
@@ -184,8 +233,8 @@ function MapJobTitle(props) {
             swal("Success", res.data.message, "success");
 
             setFormInput({
-              company: "",
-              comapny_data: [],
+              job_title: "",
+              job_title_data: [],
             });
 
             setErrors({});
@@ -261,6 +310,21 @@ function MapJobTitle(props) {
                           </option>
                         ))}
                       </select>
+
+                      {/* Remove Button */}
+                      {selectedJobTitles && selectedJobTitles.length > 0 && (
+                        <button
+                          className="btn btn-sm btn-danger mt-4 btn-user"
+                          style={{
+                            fontSize: "14px",
+                            padding: "1% 6%",
+                            float: "left",
+                          }}
+                          onClick={removeJobTitleData}
+                        >
+                          <i className="fa fa-solid fa-trash"></i> &nbsp; Remove
+                        </button>
+                      )}
                     </div>
 
                     <div className="col-md-3 text-center">

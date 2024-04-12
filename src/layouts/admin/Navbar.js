@@ -19,7 +19,7 @@ function Navbar({ menuOpen, setMenuOpen, toggleMenu }) {
   const [profile, setProfile] = useState([]);
 
   useEffect(() => {
-    axios.get(`/api/profile`).then((res) => {
+    axios.post(`/api/profile`).then((res) => {
       if (res.data.status === 200) {
         setProfile(res.data.user);
       }
